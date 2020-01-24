@@ -1,4 +1,4 @@
-# SimpleBookStore
+# BookStore
 
 ## How to Test
 ```
