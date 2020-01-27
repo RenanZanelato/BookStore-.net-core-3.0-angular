@@ -8,9 +8,13 @@ namespace BookStore.Service.Service
     public class BookService : BaseService<Book>, IBookService
     {
         private readonly IBookRepository _bookRepository;
-        public BookService(IBookRepository bookRepository) : base(bookRepository)
+        private readonly IAuthorRepository _authorRepository;
+        private readonly IGenreRepository _genreRepository;
+        public BookService(IBookRepository bookRepository,IAuthorRepository authorRepository,IGenreRepository genreRepository) : base(bookRepository)
         {
             _bookRepository = bookRepository;
+            _authorRepository = authorRepository;
+            _genreRepository = genreRepository;
         }
 
         public override Book Post(Book obj)
@@ -22,6 +26,11 @@ namespace BookStore.Service.Service
                 {
                     continue;
                 }
+                Author verifyAuthor = _authorRepository.Select(bookAuthor.AuthorId);
+                if(verifyAuthor == null)
+                {
+                    throw new Exception("Author " + bookAuthor.AuthorId + "don't exist in database");
+                }
                 bookAuthor.BookId = obj.Id;
             }
 
@@ -30,6 +39,11 @@ namespace BookStore.Service.Service
                 if (bookGenre.GenreId == null)
                 {
                     continue;
+                }
+                Genre verifyGenre = _genreRepository.Select(bookGenre.GenreId);
+                if (verifyGenre == null)
+                {
+                    throw new Exception("Author " + bookGenre.GenreId + "don't exist in database");
                 }
                 bookGenre.BookId = obj.Id;
             }
