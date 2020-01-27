@@ -13,27 +13,27 @@ namespace BookStore.Service.Service
         {
             _repository = repository;
         }
-        public void Delete(Guid id)
+        public virtual void Delete(Guid id)
         {
             _repository.Delete(id);
         }
 
-        public T Get(Guid id)
+        public virtual T Get(Guid id)
         {
             return _repository.Select(id);
         }
 
-        public IEnumerable<T> Get()
+        public virtual IEnumerable<T> Get()
         {
             return _repository.SelectAll();
         }
 
-        public T Post(T obj)
+        public virtual T Post(T obj)
         {
             return _repository.Insert(obj);
         }
 
-        public T Put(T obj)
+        public virtual T Put(T obj)
         {
             return _repository.Update(obj);
         }

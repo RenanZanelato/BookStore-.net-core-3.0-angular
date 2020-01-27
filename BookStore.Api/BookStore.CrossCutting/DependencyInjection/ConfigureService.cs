@@ -11,6 +11,7 @@ namespace BookStore.CrossCutting.DependencyInjection
             serviceCollection.AddTransient(typeof(IBaseService<>), typeof(BaseService<>));
             serviceCollection.AddTransient<IBookService, BookService>();
             serviceCollection.AddTransient<IAuthorService, AuthorService>();
+            serviceCollection.AddTransient<IGenreService, GenreService>();
         }
     }
 }
