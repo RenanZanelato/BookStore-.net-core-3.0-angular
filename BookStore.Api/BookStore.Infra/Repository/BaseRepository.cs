@@ -5,62 +5,68 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BookStore.Infra.Repository
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
         private readonly MyContext _context;
+        private DbSet<T> _dataset;
         public BaseRepository(MyContext context)
         {
             _context = context;
+            _dataset = context.Set<T>();
         }
 
-        public bool Delete(Guid id)
+        public async Task<bool> Delete(Guid id)
         {
-            var result = Select(id);
-            if(result == null)
+            var result = await _dataset.SingleOrDefaultAsync(p => p.Id.Equals(id));
+            if (result == null)
             {
                 throw new Exception("Any data to delete");
             }
-            _context.Set<T>().Remove(result);
-            _context.SaveChanges();
+            _dataset.Remove(result);
+            await _context.SaveChangesAsync();
             return true;
         }
 
-        public T Insert(T obj)
+        public async Task<T> Insert(T item)
         {
-            obj.CreatedAt = DateTime.UtcNow;
-            obj.UpdateAt = DateTime.UtcNow;
-            _context.Set<T>().Add(obj);
-            _context.SaveChanges();
-
-            return obj;
-        }
-
-        public T Select(Guid id)
-        {
-            return _context.Set<T>().Find(id);
-        }
-
-        public IEnumerable<T> SelectAll()
-        {
-            return _context.Set<T>().ToList();
-        }
-
-        public T Update(T obj)
-        {
-            var result = Select(obj.Id);
-            if(result == null)
+            if (item.Id == Guid.Empty)
             {
-                throw new Exception("Any data to Update");
+                item.Id = Guid.NewGuid();
             }
-            obj.UpdateAt = DateTime.UtcNow;
-            obj.CreatedAt = result.CreatedAt;
+            item.CreatedAt = DateTime.UtcNow;
+            _dataset.Add(item);
+            await _context.SaveChangesAsync();
+            return item;
+        }
 
-            _context.Entry(result).CurrentValues.SetValues(obj);
-            _context.SaveChanges();
-            return obj;
+        public async Task<T> Select(Guid id)
+        {
+            var result = await _dataset.SingleOrDefaultAsync(p => p.Id.Equals(id));
+            return result;
+        }
+
+        public async Task<IEnumerable<T>> SelectAll()
+        {
+            return await _dataset.ToListAsync();
+        }
+
+        public async Task<T> Update(T item)
+        {
+            var result = await _dataset.SingleOrDefaultAsync(p => p.Id.Equals(item.Id));
+            if (result == null)
+            {
+                throw new Exception("Any data to update");
+            }
+            item.UpdateAt = DateTime.UtcNow;
+            item.CreatedAt = result.CreatedAt;
+            _context.Entry(result).CurrentValues.SetValues(item);
+            await _context.SaveChangesAsync();
+            return result;
         }
     }
 }
+

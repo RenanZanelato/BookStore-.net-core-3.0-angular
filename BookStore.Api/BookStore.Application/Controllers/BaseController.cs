@@ -2,6 +2,7 @@
 using BookStore.Domain.Interfaces.Service;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading.Tasks;
 
 namespace BookStore.Application.Controllers
 {
@@ -17,39 +18,39 @@ namespace BookStore.Application.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] T item)
+        public async Task<IActionResult> Post([FromBody] T item)
         {
-            _service.Post(item);
+            await _service.Post(item);
             return new ObjectResult(item);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public IActionResult Put([FromBody] T item, Guid id)
+        public async Task<IActionResult> Put([FromBody] T item, Guid id)
         {
             item.Id = id;
-            return new ObjectResult(_service.Put(item));
+            return new ObjectResult(await _service.Put(item));
         }
 
         [HttpGet]
         [Route("{id}")]
-        public IActionResult Get(Guid id)
+        public async Task<IActionResult> Get(Guid id)
         {
 
-            return new ObjectResult(_service.Get(id));
+            return new ObjectResult(await _service.Get(id));
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return new ObjectResult(_service.Get());
+            return new ObjectResult(await _service.Get());
         }
 
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            _service.Delete(id);
+           await  _service.Delete(id);
             return new ObjectResult(
                 new
                 {

@@ -3,6 +3,7 @@ using BookStore.Domain.Interfaces.Repository;
 using BookStore.Domain.Interfaces.Service;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BookStore.Service.Service
 {
@@ -13,29 +14,29 @@ namespace BookStore.Service.Service
         {
             _repository = repository;
         }
-        public virtual void Delete(Guid id)
+        public virtual async Task<bool> Delete(Guid id)
         {
-            _repository.Delete(id);
+            return await _repository.Delete(id);
         }
 
-        public virtual T Get(Guid id)
+        public virtual async Task<T> Get(Guid id)
         {
-            return _repository.Select(id);
+            return await _repository.Select(id);
         }
 
-        public virtual IEnumerable<T> Get()
+        public virtual async Task<IEnumerable<T>> Get()
         {
-            return _repository.SelectAll();
+            return await _repository.SelectAll();
         }
 
-        public virtual T Post(T obj)
+        public virtual async Task<T> Post(T obj)
         {
-            return _repository.Insert(obj);
+            return await _repository.Insert(obj);
         }
 
-        public virtual T Put(T obj)
+        public virtual async Task<T> Put(T obj)
         {
-            return _repository.Update(obj);
+            return await _repository.Update(obj);
         }
     }
 }

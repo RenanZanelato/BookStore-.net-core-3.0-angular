@@ -1,19 +1,20 @@
 ﻿using BookStore.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BookStore.Domain.Interfaces.Service
 {
     public interface IBaseService<T> where T : BaseEntity
     {
-        T Post(T obj);
+        Task<T> Post(T obj);
 
-        T Put(T obj);
-        void Delete(Guid id);
+        Task<T> Put(T obj);
+        Task<bool> Delete(Guid id);
 
-        T Get(Guid id);
+        Task<T> Get(Guid id);
 
-        IEnumerable<T> Get();
+        Task<IEnumerable<T>> Get();
     }
 }
 

@@ -1,7 +1,9 @@
 ﻿using BookStore.Domain.Entities;
+using BookStore.Domain.Exceptions;
 using BookStore.Domain.Interfaces.Repository;
 using BookStore.Domain.Interfaces.Service;
 using System;
+using System.Threading.Tasks;
 
 namespace BookStore.Service.Service
 {
@@ -17,37 +19,41 @@ namespace BookStore.Service.Service
             _genreRepository = genreRepository;
         }
 
-        public override Book Post(Book obj)
+        public override async Task<Book> Post(Book obj)
         {
             obj.Id = Guid.NewGuid();
-            foreach (BookAuthor bookAuthor in obj.BookAuthor)
+            if (obj.BookAuthor.Count >= 1)
             {
-                if (bookAuthor.AuthorId == null)
+                foreach (BookAuthor bookAuthor in obj.BookAuthor)
                 {
-                    continue;
+                    if (bookAuthor.AuthorId == null)
+                    {
+                        continue;
+                    }
+                    Author verifyAuthor = await _authorRepository.Select(bookAuthor.AuthorId);
+                    if (verifyAuthor == null)
+                    {
+                        throw new AuthorException("Author " + bookAuthor.AuthorId + "don't exist in database");
+                    }
+                    bookAuthor.BookId = obj.Id;
                 }
-                Author verifyAuthor = _authorRepository.Select(bookAuthor.AuthorId);
-                if(verifyAuthor == null)
-                {
-                    throw new Exception("Author " + bookAuthor.AuthorId + "don't exist in database");
-                }
-                bookAuthor.BookId = obj.Id;
             }
-
+            if(obj.BookGenre.Count >= 1) { 
             foreach (BookGenre bookGenre in obj.BookGenre)
             {
                 if (bookGenre.GenreId == null)
                 {
                     continue;
                 }
-                Genre verifyGenre = _genreRepository.Select(bookGenre.GenreId);
+                Genre verifyGenre = await _genreRepository.Select(bookGenre.GenreId);
                 if (verifyGenre == null)
                 {
-                    throw new Exception("Author " + bookGenre.GenreId + "don't exist in database");
+                    throw new GenreException("Genre " + bookGenre.GenreId + "don't exist in database");
                 }
                 bookGenre.BookId = obj.Id;
             }
-            return base.Post(obj);
+            }
+            return await base.Post(obj);
         }
     }
 }

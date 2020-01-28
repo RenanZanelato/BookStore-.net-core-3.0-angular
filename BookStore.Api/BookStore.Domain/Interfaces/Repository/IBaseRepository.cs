@@ -1,16 +1,17 @@
 ﻿using BookStore.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BookStore.Domain.Interfaces.Repository
 {
     public interface IBaseRepository<T> where T : BaseEntity
     {
-        T Insert(T obj);
-        T Update(T obj);
-        bool Delete(Guid id);
-        T Select(Guid id);
-        IEnumerable<T> SelectAll();
+        Task<T> Insert(T obj);
+        Task<T> Update(T obj);
+        Task<bool> Delete(Guid id);
+        Task<T> Select(Guid id);
+        Task<IEnumerable<T>> SelectAll();
     }
 }
 
