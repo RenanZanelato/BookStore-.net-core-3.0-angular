@@ -38,6 +38,7 @@ namespace BookStore.Infra.Repository
                 item.Id = Guid.NewGuid();
             }
             item.CreatedAt = DateTime.UtcNow;
+            item.UpdateAt = DateTime.UtcNow;
             _dataset.Add(item);
             await _context.SaveChangesAsync();
             return item;

@@ -21,7 +21,13 @@ namespace BookStore.Application.Controllers
         public async Task<IActionResult> Post([FromBody] T item)
         {
             await _service.Post(item);
-            return new ObjectResult(item);
+            return new ObjectResult(
+                new
+                {
+                    status = 200,
+                    message = "Inserido com Sucesso"
+                }
+                );
         }
 
         [HttpPut]
@@ -29,7 +35,14 @@ namespace BookStore.Application.Controllers
         public async Task<IActionResult> Put([FromBody] T item, Guid id)
         {
             item.Id = id;
-            return new ObjectResult(await _service.Put(item));
+            await _service.Put(item);
+            return new ObjectResult(
+               new
+               {
+                   status = 200,
+                   message = "Atualizado com Sucesso"
+               }
+               );
         }
 
         [HttpGet]
@@ -37,13 +50,13 @@ namespace BookStore.Application.Controllers
         public async Task<IActionResult> Get(Guid id)
         {
 
-            return new ObjectResult(await _service.Get(id));
+            return Ok(await _service.Get(id));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return new ObjectResult(await _service.Get());
+            return Ok(await _service.Get());
         }
 
         [HttpDelete]
