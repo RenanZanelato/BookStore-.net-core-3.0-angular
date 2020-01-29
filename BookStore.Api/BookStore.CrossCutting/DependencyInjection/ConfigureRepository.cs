@@ -15,7 +15,7 @@ namespace BookStore.CrossCutting.DependencyInjection
             serviceCollection.AddScoped<IGenreRepository, GenreRepository>();
             serviceCollection.AddScoped<IBookRepository, BookRepository>();
             serviceCollection.AddDbContext<MyContext>(
-                options => options.UseSqlServer("Server=localhost,11433;Database=BookStore;Uid=SA;Pwd=DockerSql2017!;")
+                options => options.UseSqlServer(EnvironmentConnection.ConnectionString)
                 );
         }
 

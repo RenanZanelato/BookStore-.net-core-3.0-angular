@@ -1,18 +1,25 @@
-﻿using BookStore.Infra.Context;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace Api.Data.Context
+namespace BookStore.Infra.Context
 {
     public class ContextFactory : IDesignTimeDbContextFactory<MyContext>
     {
         public MyContext CreateDbContext(string[] args)
         {
-            var connectionString = "Server=localhost,11433;Database=BookStore;Uid=SA;Pwd=DockerSql2017!;";
-            var optionsBuilder = new DbContextOptionsBuilder<MyContext>();
-            optionsBuilder.UseSqlServer(connectionString);
-
-            return new MyContext(optionsBuilder.Options);
+            return new MyContext(getOptionBuilder(string.IsNullOrEmpty(EnvironmentConnection.ConnectionString)).Options);
         }
+
+        private static DbContextOptionsBuilder<MyContext> getOptionBuilder(bool isdev)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<MyContext>();
+            if (isdev == true)
+            {
+                optionsBuilder.UseInMemoryDatabase(EnvironmentConnection.DatabaseName);
+            }
+            return (isdev == true) ? optionsBuilder.UseInMemoryDatabase(EnvironmentConnection.DatabaseName) : optionsBuilder.UseSqlServer(EnvironmentConnection.ConnectionString);
+
+        }
+
     }
 }
