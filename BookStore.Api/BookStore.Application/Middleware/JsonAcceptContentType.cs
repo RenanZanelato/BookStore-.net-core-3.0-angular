@@ -10,7 +10,9 @@ namespace BookStore.Application.Middleware
     {
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            if((context.Request.ContentType != "application/json"))
+            await next(context);
+
+            if ((context.Request.ContentType != "application/json"))
             {
                 throw new Exception("Only Content-Type Json its Accept in this Application");
             }

@@ -20,14 +20,7 @@ namespace BookStore.Application.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] T item)
         {
-            await _service.Post(item);
-            return new ObjectResult(
-                new
-                {
-                    status = 200,
-                    message = "Inserido com Sucesso"
-                }
-                );
+            return Ok(await _service.Post(item));
         }
 
         [HttpPut]
@@ -35,14 +28,7 @@ namespace BookStore.Application.Controllers
         public async Task<IActionResult> Put([FromBody] T item, Guid id)
         {
             item.Id = id;
-            await _service.Put(item);
-            return new ObjectResult(
-               new
-               {
-                   status = 200,
-                   message = "Atualizado com Sucesso"
-               }
-               );
+            return Ok(await _service.Put(item));
         }
 
         [HttpGet]
@@ -65,11 +51,7 @@ namespace BookStore.Application.Controllers
         {
            await  _service.Delete(id);
             return new ObjectResult(
-                new
-                {
-                    status = 200,
-                    message = "Removido com succeso"
-                }
+                new ResponseEntity { Status = 200, Message = "Deletado com Sucesso"}
                 );
         }
     }

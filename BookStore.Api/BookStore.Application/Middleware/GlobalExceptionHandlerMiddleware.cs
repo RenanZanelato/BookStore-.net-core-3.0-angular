@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BookStore.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Net;
@@ -24,16 +25,14 @@ namespace BookStore.Application.Middleware
         {
             context.Response.ContentType = "application/json";
             
-            context.Response.StatusCode = context.Response.StatusCode < 400 ? (int) HttpStatusCode.InternalServerError : context.Response.StatusCode;
+            context.Response.StatusCode = context.Response.StatusCode < 400 ? 
+                (int) HttpStatusCode.InternalServerError : context.Response.StatusCode;
 
-            var json = new
-            {
-                context.Response.StatusCode,
-                Message = String.Format("An error occurred whilst processing your request ( {0} )", exception.Message) ,
-                Detailed = exception
-            };
-
-            return context.Response.WriteAsync(JsonConvert.SerializeObject(json));
+            return context.Response.WriteAsync(JsonConvert.SerializeObject(
+                new ResponseEntity { Status = context.Response.StatusCode,
+                    Message = String.Format("An error occurred whilst processing your request ( {0} )", exception.Message),
+                    Detailed = exception
+                }));
         }
     }
 }
