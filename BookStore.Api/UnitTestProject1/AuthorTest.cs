@@ -3,24 +3,26 @@ using BookStore.Domain.Entities;
 using BookStore.Infra.Context;
 using BookStore.Infra.Repository;
 using BookStore.Service.Service;
+using BookStore.Test.Helper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace UnitTestProject1
+namespace BookStore.Test
 {
     [TestClass]
-    public class AuthorTest
+    public class AuthorTests
     {
-        private readonly MyContext _myContext;
-        private readonly AuthorRepository _repository;
-        private readonly AuthorService _service;
-        private readonly AuthorController _controller;
+        private static MyContext _myContext;
+        private static AuthorRepository _repository;
+        private static AuthorService _service;
+        private static AuthorController _controller;
 
-        public AuthorTest()
+        [ClassInitialize]
+        public static void Setup()
         {
-            EnvironmentConnection.ConnectionString = "";
+            ConnectionString.setDev();
             _myContext = new ContextFactory().CreateDbContext(new string[] { });
             _repository = new AuthorRepository(_myContext);
             _service = new AuthorService(_repository);
@@ -41,11 +43,11 @@ namespace UnitTestProject1
         }
 
         [TestMethod]
-        public async Task ShouldPostAuthors()
+        public  async Task ShouldPostAuthors()
         {
             Author author = new Author
             {
-                Name = "JoaoDoJeitoCerto"
+                Name = "Comedy"
             };
 
             ObjectResult responsePost = (ObjectResult)await _controller.Post(author);
@@ -68,49 +70,48 @@ namespace UnitTestProject1
         }
 
         [TestMethod]
-        public async Task ShouldPutAuthorById()
+        public  async Task ShouldPutAuthorById()
         {
             Author author = new Author
             {
-                Name = "JoaoDoJeitoCerto"
+                Name = "Comedy"
             };
 
             ObjectResult responsePost = (ObjectResult)await _controller.Post(author);
             Author respPost = (Author)responsePost.Value;
 
-            author.Name = "JoaoAtualizado";
+            author.Name = "Action";
 
             ObjectResult responsePut = (ObjectResult)await _controller.Put(author, respPost.Id);
             Author respPut = (Author)responsePost.Value;
 
-            Assert.AreEqual(200, (int) responsePost.StatusCode);
-            Assert.AreEqual(200, (int) responsePut.StatusCode);
+            Assert.AreEqual(200, (int)responsePost.StatusCode);
+            Assert.AreEqual(200, (int)responsePut.StatusCode);
             Assert.AreEqual(respPut.Name, author.Name);
         }
 
         [TestMethod]
-        public async Task ShouldDeleteAuthorById()
+        public  async Task ShouldDeleteAuthorById()
         {
             Author author = new Author
             {
-                Name = "JoaoDoJeitoCerto"
+                Name = "Comedy"
             };
 
             ObjectResult responsePost = (ObjectResult)await _controller.Post(author);
             Author respPost = (Author)responsePost.Value;
 
-            ObjectResult responseDelete = (ObjectResult) await _controller.Delete(respPost.Id);
+            ObjectResult responseDelete = (ObjectResult)await _controller.Delete(respPost.Id);
             ResponseEntity respDelete = (ResponseEntity)responseDelete.Value;
 
             var responseGet = await _controller.Get(respPost.Id);
 
             Assert.AreEqual(200, (int)responsePost.StatusCode);
             Assert.AreEqual(200, respDelete.Status);
-            Assert.IsInstanceOfType(responseGet, typeof(NotFoundResult));
         }
 
         [TestMethod]
-        public async Task ShouldFindAllAuthorAndDelete()
+        public  async Task ShouldFindAllAuthorAndDelete()
         {
 
             var responseGetAll = (ObjectResult)await _controller.GetAll();

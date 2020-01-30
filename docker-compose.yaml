@@ -1,13 +1,133 @@
-version: '3'
-services:
-    sqlserver:
-      image: microsoft/mssql-server-linux
-      hostname: db1
-      container_name: sqlserver_bookstore
-      environment:
-         SA_PASSWORD: "MssqlPass123"
-         ACCEPT_EULA: "Y"
-         MSSQL_SA_PASSWORD: "DockerSql2017!"
-         MSSQL_PID: "Developer"
-      ports:
-        - "11433:1433"
+using BookStore.Application.Controllers;
+using BookStore.Domain.Entities;
+using BookStore.Infra.Context;
+using BookStore.Infra.Repository;
+using BookStore.Service.Service;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace BookStore.Test
+{
+    [TestClass]
+    public class GenreTest
+    {
+        private readonly MyContext _myContext;
+        private readonly GenreRepository _repository;
+        private readonly GenreService _service;
+        private readonly GenreController _controller;
+
+        public GenreTest()
+        {
+            EnvironmentConnection.ConnectionString = "";
+            _myContext = new ContextFactory().CreateDbContext(new string[] { });
+            _repository = new GenreRepository(_myContext);
+            _service = new GenreService(_repository);
+            _controller = new GenreController(_service);
+        }
+
+        [TestMethod]
+        public static async Task ShouldGetAnEmptyGenresList()
+        {
+            var response = (ObjectResult)await _controller.GetAll();
+
+            var value = response.Value.GetType()
+                .GetProperty("Count")
+                .GetValue(response.Value);
+
+            Assert.AreEqual(200, response.StatusCode);
+            Assert.AreEqual(0, value);
+        }
+
+        [TestMethod]
+        public static async Task ShouldPostGenres()
+        {
+            Genre genre = new Genre
+            {
+                Name = "Comedy"
+            };
+
+            ObjectResult responsePost = (ObjectResult)await _controller.Post(genre);
+            Genre respPost = (Genre)responsePost.Value;
+
+            ObjectResult responseGet = (ObjectResult)await _controller.Get(respPost.Id);
+            Genre respGet = (Genre)responsePost.Value;
+
+            var responseGetAll = (ObjectResult)await _controller.GetAll();
+            var respGetAll = responseGetAll.Value.GetType()
+                .GetProperty("Count")
+                .GetValue(responseGetAll.Value);
+
+
+            Assert.AreEqual(200, (int)responsePost.StatusCode);
+            Assert.AreEqual(200, (int)responseGet.StatusCode);
+            Assert.AreEqual(respGet.Id, respPost.Id);
+            Assert.AreEqual(1, respGetAll);
+
+        }
+
+        [TestMethod]
+        public static async Task ShouldPutGenreById()
+        {
+            Genre genre = new Genre
+            {
+                Name = "Comedy"
+            };
+
+            ObjectResult responsePost = (ObjectResult)await _controller.Post(genre);
+            Genre respPost = (Genre)responsePost.Value;
+
+            genre.Name = "Action";
+
+            ObjectResult responsePut = (ObjectResult)await _controller.Put(genre, respPost.Id);
+            Genre respPut = (Genre)responsePost.Value;
+
+            Assert.AreEqual(200, (int)responsePost.StatusCode);
+            Assert.AreEqual(200, (int)responsePut.StatusCode);
+            Assert.AreEqual(respPut.Name, genre.Name);
+        }
+
+        [TestMethod]
+        public static async Task ShouldDeleteGenreById()
+        {
+            Genre genre = new Genre
+            {
+                Name = "Comedy"
+            };
+
+            ObjectResult responsePost = (ObjectResult)await _controller.Post(genre);
+            Genre respPost = (Genre)responsePost.Value;
+
+            ObjectResult responseDelete = (ObjectResult)await _controller.Delete(respPost.Id);
+            ResponseEntity respDelete = (ResponseEntity)responseDelete.Value;
+
+            var responseGet = await _controller.Get(respPost.Id);
+
+            Assert.AreEqual(200, (int)responsePost.StatusCode);
+            Assert.AreEqual(200, respDelete.Status);
+        }
+
+        [TestMethod]
+        public static async Task ShouldFindAllGenreAndDelete()
+        {
+
+            var responseGetAll = (ObjectResult)await _controller.GetAll();
+            var respGetAll = (IEnumerable<Genre>)responseGetAll.Value;
+
+            foreach (Genre genre in respGetAll)
+            {
+                ObjectResult responseDelete = (ObjectResult)await _controller.Delete(genre.Id);
+                ResponseEntity respDelete = (ResponseEntity)responseDelete.Value;
+                Assert.AreEqual(200, respDelete.Status);
+            }
+
+            var responseGetAll2 = (ObjectResult)await _controller.GetAll();
+            var valueGetAll = responseGetAll2.Value.GetType()
+                .GetProperty("Count")
+                .GetValue(responseGetAll2.Value);
+            Assert.AreEqual(0, valueGetAll);
+        }
+
+    }
+}
