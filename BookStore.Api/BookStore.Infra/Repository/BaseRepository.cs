@@ -11,7 +11,7 @@ namespace BookStore.Infra.Repository
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
-        private readonly MyContext _context;
+        protected readonly MyContext _context;
         private DbSet<T> _dataset;
         public BaseRepository(MyContext context)
         {

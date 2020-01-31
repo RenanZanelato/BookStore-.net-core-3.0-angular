@@ -20,7 +20,7 @@ namespace BookStore.Test
         private static AuthorController _controller;
 
         [ClassInitialize]
-        public static void Setup()
+        public static void Setup(TestContext context)
         {
             ConnectionString.setDev();
             _myContext = new ContextFactory().CreateDbContext(new string[] { });
@@ -111,7 +111,7 @@ namespace BookStore.Test
         }
 
         [TestMethod]
-        public  async Task ShouldFindAllAuthorAndDelete()
+        public async Task ShouldFindAllAuthorAndDelete()
         {
 
             var responseGetAll = (ObjectResult)await _controller.GetAll();

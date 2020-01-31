@@ -2,7 +2,9 @@
 using BookStore.Domain.Exceptions;
 using BookStore.Domain.Interfaces.Repository;
 using BookStore.Domain.Interfaces.Service;
+using BookStore.Domain.ModelViews.Response;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace BookStore.Service.Service
@@ -17,6 +19,11 @@ namespace BookStore.Service.Service
             _bookRepository = bookRepository;
             _authorRepository = authorRepository;
             _genreRepository = genreRepository;
+        }
+
+        public IEnumerable<SelectInfoBookAuthorAndGenre> GetInfoBookAuthorAndGenre(Guid? id)
+        {
+            return _bookRepository.SelectInfoAuthorAndGenre(id);
         }
 
         public override async Task<Book> Post(Book obj)
